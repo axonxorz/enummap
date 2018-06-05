@@ -5,7 +5,9 @@ Easy declarations mapping keys to values. Provides dict-like access on the
 enum class to retrieve a value mapping
 """
 
-__version__ = '0.1.0'
+from types import TupleType
+
+__version__ = '0.1.1'
 __author_name__ = 'Brendan Zerr'
 __author_email__ = 'bzerr@brainwire.ca'
 __license__ = 'BSD'
@@ -24,12 +26,11 @@ class EnumMapMeta(type):
 
         # Transform the defined ENUM values. The first index of the value
         # is used as the "key", the second index is used as a value
-        protected = ['as_str', 'keys', 'values', 'items']
         for name, val in dct.items():
-            if not name.startswith('_') and name not in protected:
+            if type(val) == TupleType:
                 mapping[val[0]] = val[1]
                 dct[name] = val[0]
-                dct['_map'] = mapping
+        dct['_map'] = mapping
 
         obj = super(EnumMapMeta, cls).__new__(cls, name, parents, dct)
         return obj
