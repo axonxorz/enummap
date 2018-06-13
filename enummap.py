@@ -7,7 +7,7 @@ enum class to retrieve a value mapping
 
 from types import TupleType
 
-__version__ = '0.1.1'
+__version__ = '0.1.2'
 __author_name__ = 'Brendan Zerr'
 __author_email__ = 'bzerr@brainwire.ca'
 __license__ = 'BSD'
@@ -23,14 +23,25 @@ class EnumMapMeta(type):
         the class will return the "value" of the mapping
         """
         mapping = {}
+        rev_mapping = {}
 
         # Transform the defined ENUM values. The first index of the value
         # is used as the "key", the second index is used as a value
-        for name, val in dct.items():
-            if type(val) == TupleType:
+        protected = ('_order',)
+        for attr_name, val in dct.items():
+            if type(val) == TupleType and attr_name not in protected:
                 mapping[val[0]] = val[1]
-                dct[name] = val[0]
+                dct[attr_name] = val[0]
+                rev_mapping[val] = attr_name
         dct['_map'] = mapping
+
+        if '_order' in dct:
+            # Transform _order to contain mapped values instead of raw values
+            order = dct['_order']
+            new_order = []
+            for item in order:
+                new_order.append(rev_mapping[item])
+            dct['_order'] = new_order
 
         obj = super(EnumMapMeta, cls).__new__(cls, name, parents, dct)
         return obj
@@ -55,6 +66,11 @@ class EnumMapMeta(type):
 
     def items(self):
         return self._map.items()
+
+    def ordered(self):
+        if '_order' not in self.__dict__:
+            raise AttributeError('{} has no specified _order attribute'.format(repr(self)))
+        return [(getattr(self, x), self[getattr(self, x)]) for x in self._order]
 
     def __repr__(self):
         return '<EnumMap:{}>'.format(self.__name__)
