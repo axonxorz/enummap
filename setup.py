@@ -18,7 +18,7 @@ main_module_name = 'enummap'
 main_module = __import__(main_module_name)
 version = main_module.__version__
 
-main_module_doc = main_module.__doc__.decode('utf-8')
+main_module_doc = main_module.__doc__
 short_description, long_description = (
     textwrap.dedent(desc).strip()
     for desc in main_module_doc.split('\n\n', 1)

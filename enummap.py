@@ -5,9 +5,7 @@ Easy declarations mapping keys to values. Provides dict-like access on the
 enum class to retrieve a value mapping
 """
 
-from types import TupleType
-
-__version__ = '0.1.2'
+__version__ = '0.2.0'
 __author_name__ = 'Brendan Zerr'
 __author_email__ = 'bzerr@brainwire.ca'
 __license__ = 'BSD'
@@ -29,7 +27,7 @@ class EnumMapMeta(type):
         # is used as the "key", the second index is used as a value
         protected = ('_order',)
         for attr_name, val in dct.items():
-            if type(val) == TupleType and attr_name not in protected:
+            if isinstance(val, tuple) and attr_name not in protected:
                 mapping[val[0]] = val[1]
                 dct[attr_name] = val[0]
                 rev_mapping[val] = attr_name
@@ -75,7 +73,7 @@ class EnumMapMeta(type):
     def __repr__(self):
         return '<EnumMap:{}>'.format(self.__name__)
 
-class EnumMap(object):
+class EnumMap(object, metaclass=EnumMapMeta):
     """
     Easy, simple enum class. Define attributes as a 2-tuple of (key, value).
     The EnumMeta metaclass will transform the class to support iteration and [] getitem access
@@ -88,4 +86,3 @@ class EnumMap(object):
         SOME_OTHER_VALUE = (2, 'The other value')
     """
 
-    __metaclass__ = EnumMapMeta
