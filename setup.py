@@ -28,6 +28,7 @@ short_description, long_description = (
 setup(
     name=distribution_name,
     version=version,
+    python_requires='>3.5.2',
     packages=find_packages(exclude=["test"]),
     py_modules=[main_module_name],
 
